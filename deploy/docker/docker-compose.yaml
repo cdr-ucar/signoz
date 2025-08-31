@@ -1,7 +1,5 @@
 version: "3"
 x-common: &common
-  networks:
-    - signoz-net
   restart: unless-stopped
   logging:
     options:
@@ -145,6 +143,9 @@ services:
     !!merge <<: *db-depend
     image: signoz/signoz-otel-collector:${OTELCOL_TAG:-v0.129.2}
     container_name: signoz-otel-collector
+    networks:
+      - default
+      - telemetry-net
     command:
       - --config=/etc/otel-collector-config.yaml
       - --manager-config=/etc/manager-config.yaml
@@ -185,8 +186,8 @@ services:
       - --up=
     restart: on-failure
 networks:
-  signoz-net:
-    name: signoz-net
+  telemetry-net:
+    name: telemetry-net
 volumes:
   clickhouse:
     name: signoz-clickhouse
