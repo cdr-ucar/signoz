@@ -110,10 +110,13 @@ services:
     !!merge <<: *db-depend
     image: signoz/signoz:${VERSION:-v0.93.0}
     container_name: signoz
+    networks:
+      - default
+      - web
     command:
       - --config=/root/config/prometheus.yml
-    ports:
-      - "8080:8080" # signoz port
+    # ports:
+    #   - "8080:8080" # signoz port
     #   - "6060:6060"     # pprof port
     volumes:
       - ../common/signoz/prometheus.yml:/root/config/prometheus.yml
@@ -129,6 +132,14 @@ services:
       - TELEMETRY_ENABLED=true
       - DEPLOYMENT_TYPE=docker-standalone-amd
       - DOT_METRICS_ENABLED=true
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=web
+      - traefik.http.routers.signoz.entrypoints=http,https
+      - traefik.http.routers.signoz.rule=Host(`telemetry.cdrucar.fr`)
+      - traefik.http.routers.signoz.tls=true
+      - traefik.http.routers.signoz.middlewares=admin-ips
+      - traefik.http.services.signoz.loadbalancer.server.port=8080
     healthcheck:
       test:
         - CMD
@@ -188,6 +199,8 @@ services:
 networks:
   telemetry-net:
     name: telemetry-net
+  web:
+    external: true
 volumes:
   clickhouse:
     name: signoz-clickhouse
