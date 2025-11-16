@@ -138,7 +138,7 @@ services:
       - traefik.http.routers.signoz.rule=Host(`telemetry.cdrucar.fr`)
       - traefik.http.routers.signoz.tls=true
       - traefik.http.routers.signoz.tls.certresolver=cdrucar-resolver
-      - traefik.http.routers.signoz.middlewares=admin-ips
+      - traefik.http.routers.signoz.middlewares=authelia-cdr@file
       - traefik.http.services.signoz.loadbalancer.server.port=8080
     healthcheck:
       test:
